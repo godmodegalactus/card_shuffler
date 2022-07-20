@@ -9,11 +9,8 @@
 
 std::vector<Card> shuffle_cards_randomly()
 {
-    std::random_device rd;
     std::vector<Card> cards;
-    std::mt19937 gen(rd());
     cards.reserve(52);
-    std::uniform_int_distribution<> distrib(0, 51);
     // generate cards
     for( short i = 0; i < static_cast<short>(Suit::_max); ++i )
     {
@@ -23,23 +20,27 @@ std::vector<Card> shuffle_cards_randomly()
         }
     }
 
-     random_shuffle( cards.begin(), cards.end(), [&gen, &distrib](){return distrib(gen);} );
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::shuffle( cards.begin(), cards.end(), gen);
+    return cards;
 }
 
 int main(int argc, char** argv) {
-    if(argc != 2)
-    {
-        return -1;
-    }
     std::random_device rd;
     if(rd.entropy() == 0)
     {
         std::cerr << "random device is not supported";
+        std::cout << "random device is not supported";
         return -1;
     }
 
     auto cards = shuffle_cards_randomly();
     assert(cards.size()==52);
     
-    std::fstream out_file(argv[1], std::ios_base::out);
+    for (auto card : cards)
+    {
+        std::cout << card.to_string() << "\n";
+    }
+    return 0;
 }
